@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "bluetooth.h": "c"
+        "bluetooth.h": "c",
+        "uart.h": "c"
     }
 }

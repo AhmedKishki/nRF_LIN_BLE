@@ -1,5 +1,4 @@
 #include <zephyr/kernel.h>
-#include <zephyr/drivers/uart.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(cmain, CONFIG_LOG_DEFAULT_LEVEL);
@@ -16,7 +15,9 @@ K_MSGQ_DEFINE(q_thread0, 1, 16, 1);
 K_MSGQ_DEFINE(q_thread1, 1, 16, 1);
 K_MSGQ_DEFINE(q_thread2, 1, 16, 1);
 
-/* UART API */
+/* UART */
+#include <zephyr/drivers/uart.h>
+
 static const struct device *uart_dev = DEVICE_DT_GET(UART_NODE);
 struct uart_config uart_cfg = 
 {
@@ -117,6 +118,7 @@ static void uart_cb(const struct device *dev, void *user_data)
     }
 }
 
+/* Threads */
 static void thread0(void *a, void *b, void *c)
 {
     ARG_UNUSED(a); ARG_UNUSED(b); ARG_UNUSED(c);
@@ -168,10 +170,25 @@ K_THREAD_DEFINE(thread2_id, STACKSIZE, thread2, NULL, NULL, NULL,
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/gap.h>
 
+#define DEVICE_NAME CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 
+static const struct bt_data ad[] = {
+	BT_DATA_BYTES(BT_DATA_FLAGS, ( BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)), 					// advertising flags
+	BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),		// advertising data
+};
 
+static const struct bt_data sd[] = {
+
+};
+
+static 
+
+/* main */
 int main(void)
 {
+	int err;
+
 	if (!device_is_ready(uart_dev)) 
 	{
 		LOG_ERR("UART device not ready");
@@ -186,6 +203,14 @@ int main(void)
 		return -1;
 	}
 	*/
+
+	err = bt_enable(NULL);
+	if (err) 
+	{
+		LOG_ERR("Bluetooth init failed (err %d)\n", err);
+		return -1;
+	}
+	LOG_INF("Bluetooth initialized\n");
 	
 	uart_irq_callback_user_data_set(uart_dev, uart_cb, NULL);
     
