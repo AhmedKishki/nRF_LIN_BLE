@@ -1,0 +1,1 @@
+Zephyr code for LIN on nrf52840dk + BLE

@@ -165,6 +165,9 @@ K_THREAD_DEFINE(thread2_id, STACKSIZE, thread2, NULL, NULL, NULL,
 
 
 /* BLE setup */
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/gap.h>
+
 
 
 int main(void)
